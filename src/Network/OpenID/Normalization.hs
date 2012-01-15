@@ -22,16 +22,9 @@ import Data.List
 import Network.URI hiding (scheme,path)
 
 
--- | Normalize an identifier, discarding XRIs.
+-- | Normalize an identifier.
 normalizeIdentifier :: Identifier -> Maybe Identifier
-normalizeIdentifier  = normalizeIdentifier' (const Nothing)
-
-
--- | Normalize the user supplied identifier, using a supplied function to
--- normalize an XRI.
-normalizeIdentifier' :: (String -> Maybe String) -> Identifier
-                     -> Maybe Identifier
-normalizeIdentifier' xri (Identifier str)
+normalizeIdentifier (Identifier str)
   | null str                  = Nothing
   | "xri://" `isPrefixOf` str = Identifier `fmap` xri str
   | head str `elem` "=@+$!"   = Identifier `fmap` xri str
@@ -52,3 +45,7 @@ normalizeIdentifier' xri (Identifier str)
           $ normalizeEscape
           $ normalizeCase
           $ uriToString (const "") u []
+
+-- |Dummy XRI resolver by using xri.net.
+xri :: String -> Maybe String
+xri x = Just $ "https://xri.net/" ++ x
